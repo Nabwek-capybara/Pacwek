@@ -109,14 +109,9 @@ end
     current.rolls[player] =
         current.rolls[player] or {}
 
-	PacwekCompat:Print( -- debuger rolle
-    "Stored roll: " ..
-    player ..
-    " " ..
-    rollType ..
-    " " ..
-    roll
 )
+
+
     local existing =
         current.rolls[player][rollType]
 
@@ -158,6 +153,9 @@ end
         rollType ..
         ")"
     )
+	
+	PacwekRolls:CheckAutoFinish()
+	
 end)
 
 function PacwekRolls:Start(item)
@@ -209,6 +207,50 @@ function PacwekRolls:Start(item)
         "MS/SR: /roll - OS: /roll 99 - TMOG: /roll 98",
         "RAID"
     )
+	
+	C_Timer.After(10, function()
+
+    if PacwekRolls.active then
+
+        SendChatMessage(
+            "Rolling ends in 5 seconds",
+            "RAID"
+        )
+    end
+end)
+
+C_Timer.After(12, function()
+
+    if PacwekRolls.active then
+
+        SendChatMessage(
+            "3...",
+            "RAID"
+        )
+    end
+end)
+
+C_Timer.After(13, function()
+
+    if PacwekRolls.active then
+
+        SendChatMessage(
+            "2...",
+            "RAID"
+        )
+    end
+end)
+
+C_Timer.After(14, function()
+
+    if PacwekRolls.active then
+
+        SendChatMessage(
+            "1...",
+            "RAID"
+        )
+    end
+end)
 
     C_Timer.After(15, function()
         PacwekRolls:Finish()
@@ -257,6 +299,10 @@ function PacwekRolls:GetHighestRoll(tier)
 end
 
 function PacwekRolls:Finish()
+
+	if not self.active then
+        return
+    end
 
 	local hasSR = self:HasSR()
 	local priority
@@ -333,4 +379,36 @@ function PacwekRolls:Finish()
     )
 
 	self.active = false
+end
+
+function PacwekRolls:CheckAutoFinish()
+
+    if not self:HasSR() then
+        return
+    end
+
+    for player, count in pairs(
+        self.current.reservers
+    ) do
+		
+        local data =
+            self.current.rolls[player]
+
+        local rolls = 0
+
+        if data and data["SR"] then
+            rolls = #data["SR"]
+        end
+
+        if rolls < count then
+            return
+        end
+    end
+
+    SendChatMessage(
+        "All SR rolls received",
+        "RAID"
+    )
+
+    self:Finish()
 end
