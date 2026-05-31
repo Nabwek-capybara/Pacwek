@@ -31,6 +31,15 @@ print(Pacwek.SlashCommand)
     )
 end
 
+
+-- =========================
+-- Dostępne komendy:
+-- 		/pacwek
+-- 		/pw
+-- 		/pwroll
+--		/pwtest - do testowania SR
+-- =========================
+
 function Pacwek:SlashCommand(msg)
     msg = string.lower(msg or "")
 
@@ -49,6 +58,7 @@ function Pacwek:SlashCommand(msg)
 	PacwekCompat:Print("/pwsr")
     PacwekCompat:Print("/Pacwek show or /pw show")
     PacwekCompat:Print("/Pacwek sr <data> or /pw sr <data>")
+	PacwekCompat:Print("/pwroll <item>")
 end
 
 SLASH_PACWEKSR1 = "/pwsr"

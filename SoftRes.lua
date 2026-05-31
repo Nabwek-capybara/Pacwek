@@ -9,6 +9,15 @@ function PacwekSoftRes:Import(raw)
 
     PacwekDB.softres = {}
 	Pacwek.softres = PacwekDB.softres
+	
+	
+-- =============================
+-- SoftRes CSV export parser
+-- 
+-- Format:
+-- 		"item name", "player"
+--
+-- Parser akceptuje wszystkie nazwy itemów występujących in game.
 
     local imported = 0
 

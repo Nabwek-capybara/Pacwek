@@ -20,6 +20,28 @@ if not C_Timer then
     end
 end
 
+
+-- =============================
+-- Debug function do stosowania w addonie
+-- =============================
+
+PacwekDebug = false
+
+
+
+function PacwekCompat:Debug(msg)
+
+    if not PacwekDebug then
+        return
+    end
+
+    self:Print(msg)
+end
+
+-- ===============================
+-- Funkcja do wysyłania wiadomości na czacie
+-- ===============================
+
 function PacwekCompat:Print(msg)
     DEFAULT_CHAT_FRAME:AddMessage(
         "|cff00ff00[Pacwek]|r " .. tostring(msg)

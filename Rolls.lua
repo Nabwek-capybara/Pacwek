@@ -109,7 +109,6 @@ end
     current.rolls[player] =
         current.rolls[player] or {}
 
-)
 
 
     local existing =
@@ -157,6 +156,15 @@ end
 	PacwekRolls:CheckAutoFinish()
 	
 end)
+
+
+-- ===================================
+-- Start roll sesji
+--
+-- Item:
+--     	item name lub item link
+-- ===================================
+
 
 function PacwekRolls:Start(item)
 
@@ -257,6 +265,10 @@ end)
     end)
 end
 
+-- ======================================
+-- Funkcja do sprawdzania czy na itemie jest SR, zwraca false w przypadku gdy go brak
+-- ======================================
+
 function PacwekRolls:HasSR()
 
     for _, count in pairs(self.current.reservers) do
@@ -267,6 +279,14 @@ function PacwekRolls:HasSR()
 
     return false
 end
+
+
+-- ================================================
+-- Zwraca:
+-- Highest roll, listę winnerów
+--
+-- winnerlist ogarnia gdy jest potrzebny reroll lub kilka osób wygrywa ten sam item jak np. w przypadku tokenów
+-- =============================================================
 
 function PacwekRolls:GetHighestRoll(tier)
 
@@ -297,6 +317,18 @@ function PacwekRolls:GetHighestRoll(tier)
 
     return highest, winners
 end
+
+
+-- =======================================
+-- Finish sesji rollowania
+-- 
+-- Priorytet: SR > MS > OS >Tmog
+--
+-- Funkcja ogarnia:
+-- - Winner detection
+-- - Rerolle
+-- - Remisy
+-- =======================================
 
 function PacwekRolls:Finish()
 
@@ -380,6 +412,12 @@ function PacwekRolls:Finish()
 
 	self.active = false
 end
+
+
+-- ====================================================
+-- Automatyczny end SR rolla gdy
+-- wszyscy gracze z SR na itemie zrobią roll
+-- ====================================================
 
 function PacwekRolls:CheckAutoFinish()
 

@@ -7,7 +7,7 @@ PacwekLoot:SetScript("OnEvent", function(self, event, message)
 
     if itemLink then
         PacwekLoot:HandleLoot(itemLink)
-    end
+	    end
 end)
 
 function PacwekLoot:HandleLoot(itemName)
