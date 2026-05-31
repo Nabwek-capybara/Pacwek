@@ -1,0 +1,144 @@
+Planned — Version 0.2.0
+Advanced Loot System
+Planned Features
+Auto loot detection
+Loot popup UI
+Live roll tracking
+Priority system:
+SR > MS > OS > TMOG
+Roll type parsing:
+/roll
+/roll 99
+/roll 98
+Duplicate roll protection
+Multi-SR support
+Tie/reroll system
+Winner auto-detection
+Raid announcements
+Planned Roll Rules
+Roll Type	Command	Range
+SR/MS	/roll	1-100
+OS	/roll 99	1-99
+TMOG/GREED	/roll 98	1-98
+Planned Multi-SR Logic
+One reservation:
+one roll
+Two reservations:
+two rolls allowed
+highest retained
+Planned Tie System
+Detect equal highest rolls
+Restrict rerolls to tied players only
+Infinite reroll loop until single winner
+
+Version 0.1.5 — SR Debug & Commands
+Commands
+
+Added:
+
+/pwsr
+lists all reserved items
+/pwsr <item>
+filters reservations
+Debug
+Added import count feedback
+Added SR loading validation
+Added missing database protection
+
+
+Version 0.1.4 — Persistent Database
+SavedVariables
+Added persistent SoftRes database
+Data now survives:
+/reload
+relog
+client restart
+Database Structure
+PacwekDB = {
+    softres = {}
+}
+Runtime Sync
+Linked runtime addon state with SavedVariables
+Added automatic database initialization
+
+Version 0.1.3 — SoftRes Import System
+Import Parser
+Added CSV import support for:
+softres.it
+ exports
+Added support for:
+quoted CSV fields
+commas inside item names
+duplicate reservations
+Fixed Parsing
+
+Correctly handles items like:
+
+Fal'inrush, Defender of Quel'thalas
+Archus, Greatstaff of Antonidas
+Data Structure
+
+Implemented:
+
+item → reservers mapping
+duplicate reservation counting
+
+
+Version 0.1.2 — UI Stability Improvements
+EditBox
+Fixed non-focusable import textbox
+Added proper mouse interaction
+Added visible backdrop
+Added ESC focus clear
+Added text padding
+Window Controls
+Added ESC window close support
+Added auto-close after successful import
+Added automatic textbox clear after import
+Window Movement
+Added draggable main window
+Added screen clamping
+
+
+Version 0.1.1 — Rename / Refactor
+Rename
+Renamed addon from:
+Gargul335a
+Gargul
+To:
+Pacwek
+Refactor
+Renamed:
+addon namespace
+globals
+SavedVariables
+frame names
+slash commands
+Stability
+Fixed mixed-case namespace issues:
+PacWek
+Pacwek
+Pacwek335a
+Cache Fixes
+Resolved SavedVariables conflicts after rename
+Fixed addon cache issues caused by stale WTF data
+
+
+Pacwek Addon — Changelog
+Version 0.1.0 — Initial 3.3.5a Port
+Core
+Created standalone addon architecture for WoW 3.3.5a
+Added .toc for WotLK client compatibility
+Added Ace3-based addon initialization
+Added slash command support
+Compatibility
+Added custom C_Timer.After() compatibility layer for 3.3.5a
+Added custom print/debug wrapper
+UI
+Added initial addon window
+Added multiline import textbox
+Added Import SR button
+Added scroll frame compatibility for 3.3.5a
+Fixed broken UIPanelScrollFrameTemplate compatibility
+Added manual window toggle:
+/pacwek show
