@@ -89,3 +89,21 @@ SlashCmdList["PWTEST"] = function(msg)
 
     PacwekRolls:Start(msg)
 end
+
+SLASH_PWROLL1 = "/pwroll"
+
+SlashCmdList["PWROLL"] = function(msg)
+
+    msg = msg or ""
+
+    if msg == "" then
+
+        PacwekCompat:Print(
+            "Usage: /pwroll <item name>"
+        )
+
+        return
+    end
+
+    PacwekRolls:Start(msg)
+end

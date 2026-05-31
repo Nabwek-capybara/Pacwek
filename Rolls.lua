@@ -162,10 +162,20 @@ end)
 
 function PacwekRolls:Start(item)
 
+	local itemLink = item
+	
+	local itemName =
+    GetItemInfo(item)
+	
+	if itemName then
+		item = itemName
+	end
+
     self.active = true
 
     self.current = {
         item = item,
+		itemLink = itemLink,
         reservers = {},
         rolls = {},
         reroll = false,
@@ -182,7 +192,7 @@ function PacwekRolls:Start(item)
     end
 
     SendChatMessage(
-        "Rolling for " .. item,
+        "Rolling for " .. (itemLink or item),
         "RAID"
     )
 
@@ -301,7 +311,7 @@ function PacwekRolls:Finish()
             SendChatMessage(
                 winner ..
                 " wins " ..
-                self.current.item ..
+                (self.current.itemLink or self.current.item) ..
                 " with " ..
                 highest ..
                 " (" ..
