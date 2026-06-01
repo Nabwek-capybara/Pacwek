@@ -1,8 +1,11 @@
-Planned — Version 0.2.0
-Advanced Loot System
-Planned Features
-Auto loot detection
-Loot popup UI
+Version 0.3.0
+Multi item support
+
+Added duplicate item roll system (one roll for duplicate items from boss)
+
+
+Version 0.2.0
+
 Live roll tracking
 Priority system:
 SR > MS > OS > TMOG
@@ -20,18 +23,20 @@ Roll Type	Command	Range
 SR/MS	/roll	1-100
 OS	/roll 99	1-99
 TMOG/GREED	/roll 98	1-98
-Planned Multi-SR Logic
+Multi-SR Logic
 One reservation:
 one roll
 Two reservations:
 two rolls allowed
 highest retained
-Planned Tie System
+Tie System
 Detect equal highest rolls
 Restrict rerolls to tied players only
 Infinite reroll loop until single winner
+Added command /pwroll <item> to roll items from bags
 
 Version 0.1.5 — SR Debug & Commands
+
 Commands
 
 Added:

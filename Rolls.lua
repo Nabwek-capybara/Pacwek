@@ -199,6 +199,8 @@ function PacwekRolls:Start(item, count)
         rolls = {},
         reroll = false,
         rerollPlayers = {},
+		winners = {},
+		resolvedCount = 0,
     }
 
     local reservers =
@@ -292,7 +294,15 @@ end
 
 function PacwekRolls:HasSR()
 
-    for _, count in pairs(self.current.reservers) do
+    if not self.current
+    or not self.current.reservers then
+        return false
+    end
+
+    for _, count in pairs(
+        self.current.reservers
+    ) do
+
         if count > 0 then
             return true
         end
@@ -344,6 +354,101 @@ function PacwekRolls:GetHighestRoll(tier)
     return highest, winners
 end
 
+
+-- ====================================
+-- Sprawdza czy ostatnie miejsce
+-- kwalifikujące się do wygranej
+-- ma remis
+--
+-- Zwraca:
+-- tiePlayers
+-- tieRoll
+-- ====================================
+
+function PacwekRolls:GetTiePlayers(tier,count)
+
+
+    local entries = {}
+
+    local excluded = {}
+
+    for _, winner in ipairs(
+        self.current.winners
+    ) do
+
+        excluded[winner.player] = true
+    end
+
+    for player, rollsByType in pairs(
+        self.current.rolls
+    ) do
+
+        if not excluded[player]
+        and rollsByType[tier] then
+
+            for _, roll in ipairs(
+                rollsByType[tier]
+            ) do
+
+                table.insert(entries, {
+                    player = player,
+                    roll = roll,
+                })
+            end
+        end
+    end
+
+    table.sort(entries, function(a, b)
+        return a.roll > b.roll
+    end)
+
+    local unique = {}
+    local usedPlayers = {}
+
+    for _, entry in ipairs(entries) do
+
+        if not usedPlayers[entry.player] then
+
+            table.insert(unique, entry)
+
+            usedPlayers[entry.player] = true
+        end
+    end
+
+    local border =
+        count - self.current.resolvedCount
+
+    if border <= 0 then
+        return nil
+    end
+
+    if #unique < border then
+        return nil
+    end
+
+    local borderRoll =
+        unique[border].roll
+
+    local tiePlayers = {}
+
+    for _, entry in ipairs(unique) do
+
+        if entry.roll == borderRoll then
+
+            table.insert(
+                tiePlayers,
+                entry.player
+            )
+        end
+    end
+
+    if #tiePlayers > 1 then
+        return tiePlayers
+    end
+
+    return nil
+end
+
 -- ====================================
 -- Zwraca najlepszych unikalnych graczy
 -- dla danego tieru rolla
@@ -352,6 +457,18 @@ end
 function PacwekRolls:GetTopPlayers(tier, count)
 
     local entries = {}
+	
+	-- Gracze którzy już wygrali
+-- ====================================
+
+	local excluded = {}
+
+	for _, winner in ipairs(
+		self.current.winners
+	) do
+
+		excluded[winner.player] = true
+	end
 
     for player, rollsByType in pairs(
         self.current.rolls
@@ -380,7 +497,8 @@ function PacwekRolls:GetTopPlayers(tier, count)
 
     for _, entry in ipairs(entries) do
 
-        if not usedPlayers[entry.player] then
+        if not usedPlayers[entry.player]
+		and not excluded[entry.player] then
 
             table.insert(
                 winners,
@@ -394,7 +512,7 @@ function PacwekRolls:GetTopPlayers(tier, count)
             end
         end
     end
-
+	
     return winners
 end
 
@@ -445,6 +563,66 @@ function PacwekRolls:Finish()
                 tier,
                 itemCount
             )
+			
+		local tiePlayers =
+			self:GetTiePlayers(
+				tier,
+				itemCount
+			)
+			
+	if tiePlayers then
+	
+		local border =
+			itemCount -
+			self.current.resolvedCount
+
+		local safeWinners = border - 1
+
+		for i = 1, safeWinners do
+
+			local winner =
+				winners[i]
+
+			table.insert(
+				self.current.winners,
+				{
+					player = winner.player,
+					roll = winner.roll,
+					tier = tier,
+				}
+			)
+
+			self.current.resolvedCount =
+            self.current.resolvedCount + 1
+		end
+
+		self.current.reroll = true
+		self.current.rerollPlayers = tiePlayers
+		self.current.rolls = {}
+
+		SendChatMessage(
+			"Tie for remaining positions:  " ..
+				table.concat(
+				tiePlayers,
+				", "
+			),
+			"RAID_WARNING"
+		)
+
+		SendChatMessage(
+			"Reroll now",
+			"RAID_WARNING"
+		)
+
+		C_Timer.After(
+			15,
+			function()
+            PacwekRolls:Finish()
+			end
+		)
+
+		return
+	end
 
         if #winners > 0 then
 
@@ -466,7 +644,7 @@ function PacwekRolls:Finish()
                     " (" ..
                     tier ..
                     ")",
-                    "RAID_WARNING"
+                    "RAID"
                 )
 
                 self.active = false
@@ -479,24 +657,50 @@ function PacwekRolls:Finish()
             -- ====================================
 
             SendChatMessage(
-                "Winners for " ..
-                (self.current.itemLink or self.current.item) ..
-                ":",
-                "RAID_WARNING"
-            )
+    "Winners for " ..
+    (self.current.itemLink or self.current.item) ..
+    ":",
+    "RAID_WARNING"
+)
 
-            for index, winner in ipairs(winners) do
+		local finalWinners = {}
 
-                SendChatMessage(
-                    index ..
-                    ". " ..
-                    winner.player ..
-                    " (" ..
-                    winner.roll ..
-                    ")",
-                    "RAID"
-                )
-            end
+		-- zwycięzcy zapisani przed rerollem
+
+		for _, winner in ipairs(
+					self.current.winners
+					) do
+
+						table.insert(
+						finalWinners,
+						winner
+					)
+		end
+
+	-- zwycięzcy z ostatniej rundy
+
+		for _, winner in ipairs(winners) do
+
+			table.insert(
+				finalWinners,
+				winner
+			)
+		end
+
+		for index, winner in ipairs(
+			finalWinners
+		) do
+
+			SendChatMessage(
+				index ..
+				". " ..
+				winner.player ..
+				" (" ..
+				winner.roll ..
+				")",
+				"RAID"
+			)
+		end
 
             self.active = false
 

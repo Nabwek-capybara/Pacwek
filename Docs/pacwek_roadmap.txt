@@ -1,0 +1,327 @@
+
+PACWEK ADDON ROADMAP
+====================
+
+Project:
+--------
+Pacwek - WoW 3.3.5a / Warmane oriented loot addon
+
+Goal:
+-----
+Single-master-looter focused loot system for WotLK raids with:
+- SoftRes support
+- HR support
+- MS/OS/TMOG rolling
+- Automatic loot handling
+- Lightweight architecture
+- No addon synchronization required
+
+Design Philosophy:
+------------------
+- Optimized specifically for Warmane / Trinity-like cores
+- Stable > Feature bloat
+- ML-centric workflow
+- Fast raid UX
+- Minimal chat spam
+- No GDKP support
+- No officer sync
+- No distributed state/network layer
+
+
+==================================================
+CURRENTLY IMPLEMENTED
+==================================================
+
+[CORE]
+- Ace3 addon initialization
+- WoW 3.3.5a compatibility layer
+- SavedVariables support
+- Slash commands:
+    /pacwek
+    /pw
+    /pwsr
+    /pwtest
+
+[UI]
+- Main import window
+- ESC close support
+- Auto-close after import
+- Draggable frame
+- Scrollable multiline import field
+
+[SOFTRES]
+- CSV import from softres.it
+- Proper CSV parsing with quoted item names
+- Duplicate reservation support
+- Persistent database storage
+- Reservation lookup system
+
+[ROLL ENGINE]
+- SR/MS/OS/TMOG logic
+- Roll parsing:
+    /roll      -> SR/MS
+    /roll 99   -> OS
+    /roll 98   -> TMOG/GREED
+
+- Priority:
+    SR > MS > OS > TMOG
+
+- Duplicate roll protection
+- Multi-SR support
+- Tie/reroll system
+- Automatic winner resolution
+- Invalid roll filtering
+- Reserved item protection
+- Duplicate item roll support
+
+
+==================================================
+PLANNED ARCHITECTURE
+==================================================
+
+1. Core.lua
+------------
+Responsibilities:
+- Addon init
+- SavedVariables
+- Slash commands
+- Config
+- Global state
+
+2. Compat.lua
+--------------
+Responsibilities:
+- WoW 3.3.5a API compatibility
+- Utility wrappers
+- Timers
+- Debug/print helpers
+
+3. SoftRes.lua
+---------------
+Responsibilities:
+- SR import
+- HR import
+- Reservation lookup
+- Duplicate reservation tracking
+
+4. LootTracker.lua
+-------------------
+Responsibilities:
+- Detect loot window opening
+- Parse loot slots
+- Group duplicate items
+- Generate loot metadata
+- Loot cache
+- Boss loot announce
+
+5. Rolls.lua
+-------------
+Responsibilities:
+- Roll parsing
+- Roll timers
+- Roll validation
+- Priority resolution
+- Rerolls
+- Early finish logic
+- Multi-item handling
+
+6. Award.lua
+-------------
+Responsibilities:
+- Auto-award
+- Manual award
+- ML integration
+- Winner assignment
+- Loot history
+
+7. RaidRoster.lua
+------------------
+Responsibilities:
+- Raid member cache
+- Talent/spec detection
+- Roll completion tracking
+
+8. UI.lua
+----------
+Responsibilities:
+- Loot popup window
+- Roll tracker window
+- Award buttons
+- Minimap icon
+- Settings panel
+- Loot history display
+
+
+==================================================
+HIGH PRIORITY ROADMAP
+==================================================
+
+[PHASE 1] Backend Stability
+---------------------------
+STATUS: Mostly complete
+
+DONE:
+- SR parser
+- Roll engine
+- Persistence
+- Reroll system
+- Duplicate protection
+
+TODO:
+- Cleanup/refactor current code
+- Reduce duplicated logic
+- Add settings DB
+
+
+[PHASE 2] LootTracker System
+----------------------------
+STATUS: NEXT MAJOR STEP
+
+GOALS:
+- Detect LOOT_OPENED
+- Parse boss loot automatically
+- Announce loot to RAID chat
+- Group duplicate items
+- Display SR/HR information
+- Cache active loot session
+
+EXAMPLE:
+Loot from Professor Putricide:
+
+[Item Link]
+SR: Bowek
+
+[Token] x2
+SR:
+Bonre (2x)
+Mossa
+
+
+[PHASE 3] Advanced Roll Flow
+----------------------------
+GOALS:
+- Early finish system
+- Duplicate item rolling
+- Multiple winner resolution
+- Countdown warnings
+- RW announce support
+
+RULES:
+- If item has SR:
+    only SR rolls accepted
+
+- If all reservers rolled:
+    auto-finish
+
+- If no SR:
+    MS > OS > TMOG
+
+- Duplicate items:
+    top X rolls win
+
+
+[PHASE 4] Award Engine
+----------------------
+GOALS:
+- Auto-award single SR items
+- Manual award fallback
+- Award buttons
+- Award from bags
+- Delayed rolling support
+
+SLASH COMMAND:
+    /pwroll [itemlink]
+
+USE CASE:
+- Rolling during trash
+- Rolling after raid
+- Rolling from inventory
+
+
+[PHASE 5] UI Overhaul
+---------------------
+GOALS:
+- Loot popup
+- Live roll tracker
+- Click-to-award
+- Roll history
+- Current loot session UI
+
+ROLL WINDOW SHOULD DISPLAY:
+- Player name
+- Roll value
+- Roll type
+- Optional spec info
+
+
+[PHASE 6] Settings + Minimap
+----------------------------
+GOALS:
+- Minimap icon
+- Config panel
+- Roll timer configuration
+- Auto-end toggles
+- RW announce toggle
+- TMOG toggle
+
+
+==================================================
+OPTIONAL / FUTURE IDEAS
+==================================================
+
+[POTENTIALLY]
+- Player-side roll buttons
+- Export logs
+- Loot statistics
+- Loot history persistence
+- CSV exports
+- Session summaries
+
+[NOT PLANNED]
+- GDKP support
+- EPGP
+- Cross-client sync
+- AceComm networking
+- Retail compatibility
+- Multi-version support
+
+
+==================================================
+GITHUB / REPO SUGGESTIONS
+==================================================
+
+Recommended structure:
+
+Pacwek/
+│
+├── Core.lua
+├── Compat.lua
+├── SoftRes.lua
+├── LootTracker.lua
+├── Rolls.lua
+├── Award.lua
+├── RaidRoster.lua
+├── UI.lua
+│
+├── Libs/
+│
+├── Media/
+│
+├── docs/
+│   ├── roadmap.txt
+│   ├── changelog.txt
+│   ├── architecture.txt
+│
+└── Pacwek.toc
+
+
+==================================================
+CURRENT DEVELOPMENT PRIORITY
+==================================================
+
+NEXT TASK:
+- Build LootTracker.lua
+- Automatic boss loot detection
+- Linked loot announce
+- Duplicate item grouping
+
