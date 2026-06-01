@@ -166,7 +166,9 @@ end)
 -- ===================================
 
 
-function PacwekRolls:Start(item)
+function PacwekRolls:Start(item, count)
+
+	count = count or 1
 
 	local itemLink = item
 	
@@ -174,14 +176,25 @@ function PacwekRolls:Start(item)
     GetItemInfo(item)
 	
 	if itemName then
-		item = itemName
+		
+		local realItemLink = 
+			select(2, GetItemInfo(item))
+			
+		if realItemLink then
+			itemLink = realItemLink
+		end
+	
+	item = itemName
+	
 	end
+
 
     self.active = true
 
     self.current = {
         item = item,
 		itemLink = itemLink,
+		count = count,
         reservers = {},
         rolls = {},
         reroll = false,
@@ -197,10 +210,22 @@ function PacwekRolls:Start(item)
             (self.current.reservers[player] or 0) + 1
     end
 
-    SendChatMessage(
-        "Rolling for " .. (itemLink or item),
-        "RAID"
-    )
+    local announceItem =
+		itemLink or item
+		
+	if count > 1 then
+		announceItem = 
+			announceItem ..
+			" x" ..
+			count
+	end
+	
+	SendChatMessage(
+		"Rolling for " ..
+		announceItem ..
+		" MS/SR: /roll - OS: /roll 99 - TMOG: /roll 98",
+		"RAID_WARNING"
+	)
 
     if #reservers > 0 then
 
@@ -210,19 +235,15 @@ function PacwekRolls:Start(item)
             "RAID"
         )
     end
-
-    SendChatMessage(
-        "MS/SR: /roll - OS: /roll 99 - TMOG: /roll 98",
-        "RAID"
-    )
 	
+
 	C_Timer.After(10, function()
 
     if PacwekRolls.active then
 
         SendChatMessage(
             "Rolling ends in 5 seconds",
-            "RAID"
+            "RAID_WARNING"
         )
     end
 end)
@@ -280,10 +301,15 @@ function PacwekRolls:HasSR()
     return false
 end
 
-
 -- ================================================
 -- Zwraca:
 -- Highest roll, listę winnerów
+--
+-- count = ilość kopii itema
+-- 
+-- Double SR daje dodatkowe szanse na roll,
+-- Ale gracz może wygrać makmsymalnie
+-- jedną kopię danego iteam per roll
 --
 -- winnerlist ogarnia gdy jest potrzebny reroll lub kilka osób wygrywa ten sam item jak np. w przypadku tokenów
 -- =============================================================
@@ -318,6 +344,60 @@ function PacwekRolls:GetHighestRoll(tier)
     return highest, winners
 end
 
+-- ====================================
+-- Zwraca najlepszych unikalnych graczy
+-- dla danego tieru rolla
+-- ====================================
+
+function PacwekRolls:GetTopPlayers(tier, count)
+
+    local entries = {}
+
+    for player, rollsByType in pairs(
+        self.current.rolls
+    ) do
+
+        if rollsByType[tier] then
+
+            for _, roll in ipairs(
+                rollsByType[tier]
+            ) do
+
+                table.insert(entries, {
+                    player = player,
+                    roll = roll,
+                })
+            end
+        end
+    end
+
+    table.sort(entries, function(a, b)
+        return a.roll > b.roll
+    end)
+
+    local winners = {}
+    local usedPlayers = {}
+
+    for _, entry in ipairs(entries) do
+
+        if not usedPlayers[entry.player] then
+
+            table.insert(
+                winners,
+                entry
+            )
+
+            usedPlayers[entry.player] = true
+
+            if #winners >= count then
+                break
+            end
+        end
+    end
+
+    return winners
+end
+
 
 -- =======================================
 -- Finish sesji rollowania
@@ -332,14 +412,18 @@ end
 
 function PacwekRolls:Finish()
 
-	if not self.active then
+    if not self.active then
         return
     end
 
-	local hasSR = self:HasSR()
-	local priority
-	
-		if hasSR then
+    local hasSR = self:HasSR()
+
+    local priority
+
+    local itemCount =
+        self.current.count or 1
+
+    if hasSR then
 
         priority = {
             "SR",
@@ -353,50 +437,66 @@ function PacwekRolls:Finish()
             "TMOG",
         }
     end
+
     for _, tier in ipairs(priority) do
 
-         local highest, winners =
-            self:GetHighestRoll(tier)
+        local winners =
+            self:GetTopPlayers(
+                tier,
+                itemCount
+            )
 
-        if highest > 0 then
+        if #winners > 0 then
 
-            if #winners > 1 then
+            -- ====================================
+            -- Jeden item
+            -- ====================================
 
-                self.current.reroll = true
-                self.current.rerollPlayers = winners
-                self.current.rolls = {}
+            if itemCount == 1 then
+
+                local winner =
+                    winners[1]
 
                 SendChatMessage(
-                    "Tie detected between: " ..
-                    table.concat(winners, ", "),
-                    "RAID"
+                    winner.player ..
+                    " wins " ..
+                    (self.current.itemLink or self.current.item) ..
+                    " with " ..
+                    winner.roll ..
+                    " (" ..
+                    tier ..
+                    ")",
+                    "RAID_WARNING"
                 )
 
-                SendChatMessage(
-                    "Reroll now using appropriate roll",
-                    "RAID"
-                )
-
-                C_Timer.After(15, function()
-                    PacwekRolls:Finish()
-                end)
+                self.active = false
 
                 return
             end
 
-            local winner = winners[1]
+            -- ====================================
+            -- Wiele kopii itema
+            -- ====================================
 
             SendChatMessage(
-                winner ..
-                " wins " ..
+                "Winners for " ..
                 (self.current.itemLink or self.current.item) ..
-                " with " ..
-                highest ..
-                " (" ..
-                tier ..
-                ")",
-                "RAID"
+                ":",
+                "RAID_WARNING"
             )
+
+            for index, winner in ipairs(winners) do
+
+                SendChatMessage(
+                    index ..
+                    ". " ..
+                    winner.player ..
+                    " (" ..
+                    winner.roll ..
+                    ")",
+                    "RAID"
+                )
+            end
 
             self.active = false
 
@@ -410,7 +510,7 @@ function PacwekRolls:Finish()
         "RAID"
     )
 
-	self.active = false
+    self.active = false
 end
 
 

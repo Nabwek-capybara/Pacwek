@@ -94,15 +94,16 @@ SlashCmdList["PWTEST"] = function(msg)
     msg = msg or ""
 
     if msg == "" then
-        msg = "Deathbringer's Will"
+        msg = "Returning Footalls"
     end
 
-    PacwekRolls:Start(msg)
+    PacwekRolls:Start(msg, 2)
 end
 
 SLASH_PWROLL1 = "/pwroll"
 
 SlashCmdList["PWROLL"] = function(msg)
+
 
     msg = msg or ""
 
