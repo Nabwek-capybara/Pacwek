@@ -47,3 +47,40 @@ function PacwekCompat:Print(msg)
         "|cff00ff00[Pacwek]|r " .. tostring(msg)
     )
 end
+
+
+-- ====================================
+-- Czy aktualny gracz jest ML
+-- w raidzie z Epic threshold
+-- ====================================
+
+function PacwekCompat:IsActiveMasterLooter()
+
+    if GetNumRaidMembers() == 0 then
+        return false
+    end
+
+    local method,
+          masterLooter,
+          threshold =
+            GetLootMethod()
+
+    if method ~= "master" then
+        return false
+    end
+
+    --if threshold ~= 4 then
+		--return false
+   --end
+
+    local mlName =
+        GetRaidRosterInfo(
+            masterLooter
+        )
+
+    if mlName ~= UnitName("player") then
+        return false
+    end
+
+    return true
+end

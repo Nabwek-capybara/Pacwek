@@ -97,3 +97,22 @@ function PacwekSoftRes:GetItemReservers(itemName)
 
     return Pacwek.softres[itemName] or {}
 end
+
+function PacwekSoftRes:Clear()
+
+	if next(Pacwek.softres) == nil then
+		PacwekCompat:Print(
+			"SoftRes entries not found."
+		)
+		return
+	end
+	
+	for key in pairs(Pacwek.softres) do
+		Pacwek.softres[key] = nil
+	end
+	
+	PacwekCompat:Print(
+		"Softres list cleared."
+	)
+		
+end

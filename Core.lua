@@ -32,6 +32,16 @@ print(Pacwek.SlashCommand)
 end
 
 
+function Pacwek:LOOT_OPENED()
+
+		PacwekLoot:LOOT_OPENED()
+
+end
+
+function Pacwek:OnEnable()
+
+end
+
 -- =========================
 -- Dostępne komendy:
 -- 		/pacwek
@@ -47,6 +57,11 @@ function Pacwek:SlashCommand(msg)
         PacwekUI:Toggle()
         return
     end
+	
+	if msg == "clear" then
+		PacwekSoftRes:Clear()
+		return
+	end
 
     if string.find(msg, "sr ") then
         local data = string.sub(msg, 4)
@@ -93,19 +108,45 @@ SLASH_PWROLL1 = "/pwroll"
 
 SlashCmdList["PWROLL"] = function(msg)
 
-
     msg = msg or ""
 
     if msg == "" then
 
         PacwekCompat:Print(
-            "Usage: /pwroll <item name>"
+            "Usage: /pwroll [count] <item link>"
         )
 
         return
     end
 
-    PacwekRolls:Start(msg)
+    local count = 1
+    local item = msg
+
+    -- Czy pierwszy argument jest liczbą?
+    local firstArg, rest = string.match(
+        msg,
+        "^(%d+)%s+(.+)$"
+    )
+	
+	if count < 1 then
+
+		PacwekCompat:Print(
+			"Item count must be at least 1."
+		)
+
+		return
+	end
+	
+    if firstArg then
+
+        count = tonumber(firstArg)
+        item = rest
+    end
+
+    PacwekRolls:Start(
+        item,
+        count
+    )
 end
 
 

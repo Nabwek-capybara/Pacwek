@@ -1,7 +1,7 @@
 ## Interface: 30300
 ## Title: Pacwek
 ## Author: Pacyn & Nabwek
-## Version: 0.1.5
+## Version: 0.4.0
 ## Notes: Simplified Gargul for Warmane 3.3.5a
 ## SavedVariables: PacwekDB
 
@@ -12,8 +12,8 @@ Libs\AceConsole-3.0\AceConsole-3.0.lua
 
 Compat.lua
 Config.lua
-Core.lua
 SoftRes.lua
-Loot.lua
+LootTracker.lua
 Rolls.lua
 UI.lua
+Core.lua

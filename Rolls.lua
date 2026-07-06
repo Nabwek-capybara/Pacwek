@@ -656,57 +656,57 @@ function PacwekRolls:Finish()
             -- Wiele kopii itema
             -- ====================================
 
-            SendChatMessage(
-    "Winners for " ..
-    (self.current.itemLink or self.current.item) ..
-    ":",
-    "RAID_WARNING"
-)
+				SendChatMessage(
+				"Winners for " ..
+				(self.current.itemLink or self.current.item) ..
+				":",
+				"RAID_WARNING"
+			)
 
-		local finalWinners = {}
+					local finalWinners = {}
 
-		-- zwycięzcy zapisani przed rerollem
+					-- zwycięzcy zapisani przed rerollem
 
-		for _, winner in ipairs(
-					self.current.winners
-					) do
+					for _, winner in ipairs(
+								self.current.winners
+								) do
+
+									table.insert(
+									finalWinners,
+									winner
+								)
+					end
+
+				-- zwycięzcy z ostatniej rundy
+
+					for _, winner in ipairs(winners) do
 
 						table.insert(
-						finalWinners,
-						winner
+							finalWinners,
+							winner
+						)
+					end
+
+					for index, winner in ipairs(
+						finalWinners
+					) do
+
+					SendChatMessage(
+						index ..
+						". " ..
+						winner.player ..
+						" (" ..
+						winner.roll ..
+						")",
+						"RAID"
 					)
-		end
+				end
 
-	-- zwycięzcy z ostatniej rundy
+					self.active = false
 
-		for _, winner in ipairs(winners) do
-
-			table.insert(
-				finalWinners,
-				winner
-			)
-		end
-
-		for index, winner in ipairs(
-			finalWinners
-		) do
-
-			SendChatMessage(
-				index ..
-				". " ..
-				winner.player ..
-				" (" ..
-				winner.roll ..
-				")",
-				"RAID"
-			)
-		end
-
-            self.active = false
-
-            return
-        end
-    end
+					return
+				end
+			end
 
     SendChatMessage(
         "No valid rolls for " ..
